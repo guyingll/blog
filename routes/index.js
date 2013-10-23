@@ -6,7 +6,7 @@ var fs = require('fs'), crypto = require('crypto'), User = require('../models/us
 module.exports = function(app) {
 
 	app.get('/', function(req, res) {
-		Post.get(null, function(err, posts) {
+		Post.getAll(null, function(err, posts) {
 			if (err) {
 				posts = [];
 			}
@@ -158,6 +158,50 @@ module.exports = function(app) {
 		}
 		req.flash('success', '文件上传成功!');
 		res.redirect('/upload');
+	});
+
+	//添加了一条路由规则 app.get('/u/:name')，用来处理访问用户页的请求，
+	//然后从数据库取得该用户的数据并渲染 user.ejs 模版，生成页面并显示给用户。
+	app.get('/u/:name', function(req, res) {
+		//检查用户是否存在
+		User.get(req.params.name, function(err, user) {
+			if (!user) {
+				req.flash('error', '用户不存在!');
+				return res.redirect('/');
+				//用户不存在则跳转到主页
+			}
+			//查询并返回该用户的所有文章
+			Post.getAll(user.name, function(err, posts) {
+				if (err) {
+					req.flash('error', err);
+					return res.redirect('/');
+				}
+				res.render('user', {
+					title : user.name,
+					posts : posts,
+					user : req.session.user,
+					success : req.flash('success').toString(),
+					error : req.flash('error').toString()
+				});
+			});
+		});
+	});
+
+	//添加文章页面的路由规则
+	app.get('/u/:name/:day/:title', function(req, res) {
+		Post.getOne(req.params.name, req.params.day, req.params.title, function(err, post) {
+			if (err) {
+				req.flash('error', err);
+				return res.redirect('/');
+			}
+			res.render('article', {
+				title : req.params.title,
+				post : post,
+				user : req.session.user,
+				success : req.flash('success').toString(),
+				error : req.flash('error').toString()
+			});
+		});
 	});
 
 	function checkLogin(req, res, next) {
