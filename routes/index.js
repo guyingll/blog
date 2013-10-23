@@ -1,4 +1,4 @@
-var crypto = require('crypto'), User = require('../models/user.js'), Post = require('../models/post.js');
+var fs = require('fs'), crypto = require('crypto'), User = require('../models/user.js'), Post = require('../models/post.js');
 /*
  * GET home page.
  */
@@ -130,6 +130,34 @@ module.exports = function(app) {
 		req.flash('success', '登出成功!');
 		res.redirect('/');
 		//登出后跳转到主页
+	});
+
+	app.get('/upload', checkLogin);
+	app.get('/upload', function(req, res) {
+		res.render('upload', {
+			title : '文件上传',
+			user : req.session.user,
+			success : req.flash('success').toString(),
+			error : req.flash('error').toString()
+		});
+	});
+
+	app.post('/upload', checkLogin);
+	app.post('/upload', function(req, res) {
+		for (var i in req.files) {
+			if (req.files[i].size == 0) {
+				// 使用同步方式删除一个文件
+				fs.unlinkSync(req.files[i].path);
+				console.log('Successfully removed an empty file!');
+			} else {
+				var target_path = './public/images/' + req.files[i].name;
+				// 使用同步方式重命名一个文件
+				fs.renameSync(req.files[i].path, target_path);
+				console.log('Successfully renamed a file!');
+			}
+		}
+		req.flash('success', '文件上传成功!');
+		res.redirect('/upload');
 	});
 
 	function checkLogin(req, res, next) {

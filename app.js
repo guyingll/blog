@@ -21,7 +21,8 @@ app.set('view engine', 'ejs');
 app.use(flash());
 app.use(express.favicon(path.join(__dirname, 'public/images/favicon.ico')));
 app.use(express.logger('dev'));
-app.use(express.bodyParser());
+//添加上传配置
+app.use(express.bodyParser({ keepExtensions: true, uploadDir: './public/images' }));
 app.use(express.methodOverride());
 //cockies 支持（Cookie 解析的中间件）
 app.use(express.cookieParser());
