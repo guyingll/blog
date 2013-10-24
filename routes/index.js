@@ -6,7 +6,9 @@ var fs = require('fs'), crypto = require('crypto'), User = require('../models/us
 module.exports = function(app) {
 
 	app.get('/', function(req, res) {
-		Post.getAll(null, function(err, posts) {
+		//判断是否是第一页，并把请求的页数转换成 number 类型
+		var page = req.query.p ? parseInt(req.query.p) : 1;
+		Post.getTen(null, page, function(err, posts, total) {
 			if (err) {
 				posts = [];
 			}
@@ -14,6 +16,9 @@ module.exports = function(app) {
 				title : '主页',
 				user : req.session.user,
 				posts : posts,
+				page : page,
+				isFirstPage : (page - 1) == 0,
+				isLastPage : ((page - 1) * 10 + posts.length) == total,
 				success : req.flash('success').toString(),
 				error : req.flash('error').toString()
 			});
@@ -163,6 +168,7 @@ module.exports = function(app) {
 	//添加了一条路由规则 app.get('/u/:name')，用来处理访问用户页的请求，
 	//然后从数据库取得该用户的数据并渲染 user.ejs 模版，生成页面并显示给用户。
 	app.get('/u/:name', function(req, res) {
+		var page = req.query.p ? parseInt(req.query.p) : 1;
 		//检查用户是否存在
 		User.get(req.params.name, function(err, user) {
 			if (!user) {
@@ -170,8 +176,8 @@ module.exports = function(app) {
 				return res.redirect('/');
 				//用户不存在则跳转到主页
 			}
-			//查询并返回该用户的所有文章
-			Post.getAll(user.name, function(err, posts) {
+			//查询并返回该用户第 page 页的 10 篇文章
+			Post.getTen(user.name, page, function(err, posts, total) {
 				if (err) {
 					req.flash('error', err);
 					return res.redirect('/');
@@ -179,6 +185,9 @@ module.exports = function(app) {
 				res.render('user', {
 					title : user.name,
 					posts : posts,
+					page : page,
+					isFirstPage : (page - 1) == 0,
+					isLastPage : ((page - 1) * 10 + posts.length) == total,
 					user : req.session.user,
 					success : req.flash('success').toString(),
 					error : req.flash('error').toString()
