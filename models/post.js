@@ -25,9 +25,10 @@ Post.prototype.save = function(callback) {
 		name : this.name,
 		time : time,
 		title : this.title,
-		tags: this.tags,
+		tags : this.tags,
 		post : this.post,
-		comments : []
+		comments : [],
+		pv : 0
 	};
 	//打开数据库
 	mongodb.open(function(err, db) {
@@ -128,6 +129,22 @@ Post.getOne = function(name, day, title, callback) {
 				callback(null, doc);
 				//返回查询的一篇文章
 			});
+
+			//每访问 1 次，pv 值增加 1
+			collection.update({
+				"name" : name,
+				"time.day" : day,
+				"title" : title
+			}, {
+				$inc : {
+					"pv" : 1
+				}
+			}, function(err, res) {
+				if (err) {
+					callback(err);
+				}
+			});
+
 		});
 	});
 };
@@ -257,56 +274,55 @@ Post.getArchive = function(callback) {
 
 //返回所有标签
 Post.getTags = function(callback) {
-  //打开数据库
-  mongodb.open(function (err, db) {
-    if (err) {
-      return callback(err);
-    }
-    db.collection('posts', function (err, collection) {
-      if (err) {
-        mongodb.close();
-        return callback(err);
-      }
-      //distinct 用来找出给定键的所有不同值
-      collection.distinct("tags.tag", function (err, docs) {
-        mongodb.close();
-        if (err) {
-          return callback(err);
-        }
-        callback(null, docs);
-      });
-    });
-  });
+	//打开数据库
+	mongodb.open(function(err, db) {
+		if (err) {
+			return callback(err);
+		}
+		db.collection('posts', function(err, collection) {
+			if (err) {
+				mongodb.close();
+				return callback(err);
+			}
+			//distinct 用来找出给定键的所有不同值
+			collection.distinct("tags.tag", function(err, docs) {
+				mongodb.close();
+				if (err) {
+					return callback(err);
+				}
+				callback(null, docs);
+			});
+		});
+	});
 };
-
 
 //返回含有特定标签的所有文章
 Post.getTag = function(tag, callback) {
-  mongodb.open(function (err, db) {
-    if (err) {
-      return callback(err);
-    }
-    db.collection('posts', function (err, collection) {
-      if (err) {
-        mongodb.close();
-        return callback(err);
-      }
-      //通过 tags.tag 查询并返回只含有 name、time、title 键的文档组成的数组
-      collection.find({
-        "tags.tag": tag
-      }, {
-        "name": 1,
-        "time": 1,
-        "title": 1
-      }).sort({
-        time: -1
-      }).toArray(function (err, docs) {
-        mongodb.close();
-        if (err) {
-          return callback(err);
-        }
-        callback(null, docs);
-      });
-    });
-  });
+	mongodb.open(function(err, db) {
+		if (err) {
+			return callback(err);
+		}
+		db.collection('posts', function(err, collection) {
+			if (err) {
+				mongodb.close();
+				return callback(err);
+			}
+			//通过 tags.tag 查询并返回只含有 name、time、title 键的文档组成的数组
+			collection.find({
+				"tags.tag" : tag
+			}, {
+				"name" : 1,
+				"time" : 1,
+				"title" : 1
+			}).sort({
+				time : -1
+			}).toArray(function(err, docs) {
+				mongodb.close();
+				if (err) {
+					return callback(err);
+				}
+				callback(null, docs);
+			});
+		});
+	});
 };
