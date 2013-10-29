@@ -171,6 +171,15 @@ module.exports = function(app) {
 		res.redirect('/upload');
 	});
 
+	app.get('/links', function(req, res) {
+		res.render('links', {
+			title : '友情链接',
+			user : req.session.user,
+			success : req.flash('success').toString(),
+			error : req.flash('error').toString()
+		});
+	});
+
 	app.get('/search', function(req, res) {
 		Post.search(req.query.keyword, function(err, posts) {
 			if (err) {
@@ -349,6 +358,10 @@ module.exports = function(app) {
 				error : req.flash('error').toString()
 			});
 		});
+	});
+
+	app.use(function(req, res) {
+		res.render("404");
 	});
 
 	function checkLogin(req, res, next) {
