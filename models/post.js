@@ -228,56 +228,58 @@ Post.remove = function(name, day, title, callback) {
 				mongodb.close();
 				return callback(err);
 			}
-			
-			 //查询要删除的文档
-      collection.findOne({
-        "name": name,
-        "time.day": day,
-        "title": title
-      }, function (err, doc) {
-        if (err) {
-          mongodb.close();
-          return callback(err);
-        }
-        //如果有 reprint_from，即该文章是转载来的，先保存下来
-        var reprint_from = "";
-        if (doc.reprint_info.reprint_from) {
-          reprint_from = doc.reprint_info.reprint_from;
-        }
-        if (reprint_from != "") {
-          //更新原文章所在文档的 reprint_to
-          collection.update({
-            "name": reprint_from.name,
-            "time.day": reprint_from.day,
-            "title": reprint_from.title
-          }, {
-            $pull: {
-              "reprint_info.reprint_to": {
-                "name": name,
-                "day": day,
-                "title": title
-            }}
-          }, function (err) {
-            if (err) {
-              mongodb.close();
-              return callback(err);
-            }
-          });
-        }
-			
-			//根据用户名、日期和标题查找并删除一篇文章
-			collection.remove({
+
+			//查询要删除的文档
+			collection.findOne({
 				"name" : name,
 				"time.day" : day,
 				"title" : title
-			}, {
-				w:1
-			},function(err, result) {
-				mongodb.close();
+			}, function(err, doc) {
 				if (err) {
+					mongodb.close();
 					return callback(err);
 				}
-				callback(null);
+				//如果有 reprint_from，即该文章是转载来的，先保存下来
+				var reprint_from = "";
+				if (doc.reprint_info.reprint_from) {
+					reprint_from = doc.reprint_info.reprint_from;
+				}
+				if (reprint_from != "") {
+					//更新原文章所在文档的 reprint_to
+					collection.update({
+						"name" : reprint_from.name,
+						"time.day" : reprint_from.day,
+						"title" : reprint_from.title
+					}, {
+						$pull : {
+							"reprint_info.reprint_to" : {
+								"name" : name,
+								"day" : day,
+								"title" : title
+							}
+						}
+					}, function(err) {
+						if (err) {
+							mongodb.close();
+							return callback(err);
+						}
+					});
+				}
+
+				//根据用户名、日期和标题查找并删除一篇文章
+				collection.remove({
+					"name" : name,
+					"time.day" : day,
+					"title" : title
+				}, {
+					w : 1
+				}, function(err, result) {
+					mongodb.close();
+					if (err) {
+						return callback(err);
+					}
+					callback(null);
+				});
 			});
 		});
 	});
