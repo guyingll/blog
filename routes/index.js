@@ -124,7 +124,9 @@ module.exports = function(app) {
 			"tag" : req.body.tag2
 		}, {
 			"tag" : req.body.tag3
-		}], post = new Post(currentUser.name, currentUser.head, req.body.title, tags, req.body.post);
+		}];
+		var post = new Post(currentUser.name, currentUser.head, req.body.title,tags, req.body.post);
+
 		post.save(function(err) {
 			if (err) {
 				req.flash('error', err);
@@ -390,9 +392,9 @@ module.exports = function(app) {
 		});
 	});
 
-	app.use(function(req, res) {
-		res.render("404");
-	});
+	/*app.use(function(req, res) {
+	 res.render("404");
+	 });*/
 
 	function checkLogin(req, res, next) {
 		if (!req.session.user) {
