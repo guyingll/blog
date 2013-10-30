@@ -20,12 +20,15 @@ header {
 }
 nav {
 	position: fixed;
-	left: 10em;
+	left: 8em;
 	font-family: "Microsoft YaHei";
 	font-size: 1.1em;
 	text-transform: uppercase;
 	width: 9em;
 	text-align: right;
+	display: block;
+	zoom: 1;
+	border-bottom: 2px solid #eceeee;
 }
 nav a {
 	display: block;
@@ -132,4 +135,41 @@ article a:hover {
 	float: right;
 	margin-top: -2.5em;
 	box-shadow: 0px 1px 4px #888;
+}
+
+.zhaotit {
+	line-height: 30px;
+	color: #3b3b3b;
+	width: 45px;
+	font-size: 14px;
+}
+
+.left {
+	float: left;
+}
+
+div {
+	display: block;
+}
+
+.zhucipt {
+	text-align: left;
+	height: 20px;
+	background-color: #ffffff;
+	font-size: 12px;
+	line-height: 20px;
+	padding: 4px 4px;
+	border: 1px solid #d6d6d6;
+	width: 192px;
+	color: #b2b2b2;
+}
+
+.denglbox {
+	height: 100px;
+	padding-top: 10px;
+	padding-left: 43px;
+}
+
+.both {
+	clear: both;
 }

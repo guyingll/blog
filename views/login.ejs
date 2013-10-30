@@ -1,7 +1,32 @@
 <%- include header %>
 <form method="post">
-  用户名：<input type="text" name="name"/><br />
-  密码：  <input type="password" name="password"/><br />
-          <input type="submit" value="登录"/>
+  <div class="loginbox">
+        <div class="zhaotit left">
+            帐号:</div>
+        <div id="divMsg"> </div>
+            <div>
+                <div style="position: relative; z-index: 0;">
+                    <input id="name" name="name" class="zhucipt" value="注册邮箱或昵称" onblur="if(!this.value) {this.value='注册邮箱或昵称';this.style.color='#b2b2b2';}" onfocus="if(this.value=='注册邮箱或昵称') this.value='';this.style.color='#272727'" type="text" style="color: rgb(39, 39, 39);"></div>
+                <div style="position: absolute; margin-left: 225px; margin-top: -29px; *margin-top: -30px;" id="clologinid">
+                    <a href="javascript:void(0)" onclick="cancelloginname()">
+                        <img src="http://pubimage.360doc.com/index/sy-33.gif" height="28" width="15"></a>
+                </div>
+            </div>
+            <div style="padding-top: 10px;">
+                <div class="zhaotit left">
+                    密码:</div>
+                <div class="left" style="position:relative;">
+                    <input type="password" class="zhucipt" style="color:#272727;" id="password" name="password">
+                    <span id="tx" style="position:absolute;left:5px;top:10px;color:#b2b2b2;">密码</span>
+                    </div>
+            </div>
+            <div class="denglbox both">
+                <div style="clear: both; padding-top: 12px;">
+                    <div class="dlu2">
+                        <input type="submit" value="登录"/>
+                    </div>
+                </div>
+            </div>
+    </div>
 </form>
 <%- include footer %>
