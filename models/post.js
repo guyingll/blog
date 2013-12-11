@@ -37,23 +37,19 @@ Post.prototype.save = function(callback) {
 	mongodb.open(function(err, db) {
 		if (!err) {
 			console.log("Connected to database");
+			//错误，返回 err 信息
+		}
+		//读取 posts 集合
+		db.collection('posts', function(err, collection) {
 			mongodb.authenticate(settings.username, settings.password, function(err, db) {
 				if (!err) {
 					console.log("Authenticated");
-
-					//读取 posts 集合
-					db.collection('posts', function(err, collection) {
-						if (err) {
-							mongodb.close();
-							return callback(err);
-						}
-						//将文档插入 posts 集合
-						collection.insert(post, {
-							safe : true
-						}, function(err, post) {
-							mongodb.close();
-							callback(null);
-						});
+					//将文档插入 posts 集合
+					collection.insert(post, {
+						safe : true
+					}, function(err, post) {
+						mongodb.close();
+						callback(null);
 					});
 				} else {
 					console.log("Error in authentication.");
@@ -61,11 +57,7 @@ Post.prototype.save = function(callback) {
 					return callback(err);
 				}
 			});
-		} else {
-			console.log("Error in open().");
-			console.log(err);
-			return callback(err);
-		}
+		});
 	});
 };
 
