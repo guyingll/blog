@@ -36,6 +36,7 @@ app.use(express.session({
   cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},//30 days
   store: new MongoStore({
     db: settings.db,
+    host: settings.host,
     username: settings.username,
     password: settings.password
   })
